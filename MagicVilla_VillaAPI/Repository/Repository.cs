@@ -13,12 +13,12 @@ namespace MagicVilla_VillaAPI.Repository
         public Repository(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            this.dbSet = _context.Set<T>();
+            dbSet = _context.Set<T>();
         }
 
-        public async Task CreateAsync(T villa)
+        public async Task CreateAsync(T entity)
         {
-            await dbSet.AddAsync(villa);
+            await dbSet.AddAsync(entity);
             await SaveAsync();
         }
 
@@ -51,9 +51,9 @@ namespace MagicVilla_VillaAPI.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task RemoveAsync(T villa)
+        public async Task RemoveAsync(T entity)
         {
-            dbSet.Remove(villa);
+            dbSet.Remove(entity);
             await SaveAsync();
         }
 

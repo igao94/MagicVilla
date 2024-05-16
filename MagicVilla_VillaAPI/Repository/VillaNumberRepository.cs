@@ -3,19 +3,19 @@ using MagicVilla_VillaAPI.Models;
 
 namespace MagicVilla_VillaAPI.Repository
 {
-    public class VillaRepository : Repository<Villa>, IVillaRepository
+    public class VillaNumberRepository : Repository<VillaNumber>, IVillaNumberRepository
     {
         private readonly ApplicationDbContext _context;
 
-        public VillaRepository(ApplicationDbContext context) : base(context)
+        public VillaNumberRepository(ApplicationDbContext context) : base(context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<Villa> UpdateAsync(Villa entity)
+        public async Task<VillaNumber> UpdateAsync(VillaNumber entity)
         {
-            entity.UpdateDate = DateTime.Now;
-            _context.Villas.Update(entity);
+            entity.UpdatedDate = DateTime.Now;
+            _context.VillaNumbers.Update(entity);
             await _context.SaveChangesAsync();
 
             return entity;

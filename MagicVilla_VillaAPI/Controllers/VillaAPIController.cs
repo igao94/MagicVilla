@@ -32,6 +32,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 IEnumerable<Villa> villas = await _villaRepository.GetAllAsync();
                 _apiResponse.Result = _mapper.Map<IEnumerable<VillaDto>>(villas);
                 _apiResponse.StatusCode = HttpStatusCode.OK;
+
                 return Ok(_apiResponse);
             }
             catch (Exception ex)
@@ -86,13 +87,13 @@ namespace MagicVilla_VillaAPI.Controllers
         {
             try
             {
-                if (await _villaRepository.GetAsync(v => v.Name == villaCreateDto.Name) != null)
+                if (await _villaRepository.GetAsync(v => v.Name.ToLower() == villaCreateDto.Name.ToLower()) != null)
                 {
                     ModelState.AddModelError("CustomError", "Villa already exists!");
                     return BadRequest(ModelState);
                 }
 
-                if (villaCreateDto == null) return BadRequest(villaCreateDto);
+                if (villaCreateDto == null) return NotFound(villaCreateDto);
 
                 var villa = _mapper.Map<Villa>(villaCreateDto);
 
