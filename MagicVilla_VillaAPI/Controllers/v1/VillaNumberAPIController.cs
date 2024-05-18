@@ -2,13 +2,16 @@
 using MagicVilla_VillaAPI.Models;
 using MagicVilla_VillaAPI.Models.DTO;
 using MagicVilla_VillaAPI.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace MagicVilla_VillaAPI.Controllers
+namespace MagicVilla_VillaAPI.Controllers.v1
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [ResponseCache(CacheProfileName = "Default30")]
     public class VillaNumberAPIController : ControllerBase
     {
         protected APIResponse _apiResponse;
@@ -28,6 +31,8 @@ namespace MagicVilla_VillaAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize]
         public async Task<ActionResult<APIResponse>> GetVillaNumbers()
         {
             try
@@ -51,6 +56,8 @@ namespace MagicVilla_VillaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize]
         public async Task<ActionResult<APIResponse>> GetVillaNumber(int id)
         {
             try
@@ -58,6 +65,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 if (id == 0)
                 {
                     _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                    _apiResponse.IsSuccess = false;
                     return BadRequest(_apiResponse);
                 }
 
@@ -66,6 +74,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 if (villaNumber == null)
                 {
                     _apiResponse.StatusCode = HttpStatusCode.NotFound;
+                    _apiResponse.IsSuccess = false;
                     return BadRequest(_apiResponse);
                 }
 
@@ -87,6 +96,9 @@ namespace MagicVilla_VillaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> CreateVillaNumber([FromBody] VillaNumberCreateDto villaNumberCreateDto)
         {
             try
@@ -103,7 +115,7 @@ namespace MagicVilla_VillaAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (villaNumberCreateDto == null) return NotFound(villaNumberCreateDto);
+                if (villaNumberCreateDto == null) return NotFound();
 
                 var villaNumber = _mapper.Map<VillaNumber>(villaNumberCreateDto);
 
@@ -127,6 +139,9 @@ namespace MagicVilla_VillaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> DeleteVillaNumber(int id)
         {
             try
@@ -134,6 +149,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 if (id == 0)
                 {
                     _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                    _apiResponse.IsSuccess = false;
                     return BadRequest(_apiResponse);
                 }
 
@@ -142,6 +158,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 if (villaNumber == null)
                 {
                     _apiResponse.StatusCode = HttpStatusCode.NotFound;
+                    _apiResponse.IsSuccess = false;
                     return NotFound(_apiResponse);
                 }
 
@@ -164,6 +181,9 @@ namespace MagicVilla_VillaAPI.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> UpdateVillaNumber([FromBody] VillaNumberUpdateDto villaNumberUpdateDto,
             int id)
         {
@@ -172,6 +192,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 if (villaNumberUpdateDto == null || id != villaNumberUpdateDto.VillaNo)
                 {
                     _apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                    _apiResponse.IsSuccess = false;
                     return BadRequest(_apiResponse);
                 }
 
@@ -193,7 +214,7 @@ namespace MagicVilla_VillaAPI.Controllers
             catch (Exception ex)
             {
                 _apiResponse.IsSuccess = false;
-                _apiResponse.ErrorMessages = new List<String> { ex.Message };
+                _apiResponse.ErrorMessages = new List<string> { ex.Message };
             }
 
             return _apiResponse;
