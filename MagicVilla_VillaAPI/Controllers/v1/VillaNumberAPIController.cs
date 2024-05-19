@@ -66,6 +66,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                 {
                     _apiResponse.StatusCode = HttpStatusCode.BadRequest;
                     _apiResponse.IsSuccess = false;
+                    _apiResponse.ErrorMessages.Add("Invalid Villa Number.");
                     return BadRequest(_apiResponse);
                 }
 
@@ -75,6 +76,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                 {
                     _apiResponse.StatusCode = HttpStatusCode.NotFound;
                     _apiResponse.IsSuccess = false;
+                    _apiResponse.ErrorMessages.Add("Invalid Villa Number.");
                     return BadRequest(_apiResponse);
                 }
 
@@ -115,7 +117,11 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                     return BadRequest(ModelState);
                 }
 
-                if (villaNumberCreateDto == null) return NotFound();
+                if (villaNumberCreateDto == null)
+                {
+                    _apiResponse.ErrorMessages.Add("Please add Villa Number.");
+                    return NotFound();
+                }
 
                 var villaNumber = _mapper.Map<VillaNumber>(villaNumberCreateDto);
 
@@ -150,6 +156,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                 {
                     _apiResponse.StatusCode = HttpStatusCode.BadRequest;
                     _apiResponse.IsSuccess = false;
+                    _apiResponse.ErrorMessages.Add("Invalid Villa Number.");
                     return BadRequest(_apiResponse);
                 }
 
@@ -159,12 +166,13 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                 {
                     _apiResponse.StatusCode = HttpStatusCode.NotFound;
                     _apiResponse.IsSuccess = false;
+                    _apiResponse.ErrorMessages.Add("Invalid Villa Number.");
                     return NotFound(_apiResponse);
                 }
 
                 await _villaNumberRepository.RemoveAsync(villaNumber);
 
-                _apiResponse.StatusCode = HttpStatusCode.NoContent;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
                 _apiResponse.IsSuccess = true;
 
                 return Ok(_apiResponse);
@@ -193,6 +201,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                 {
                     _apiResponse.StatusCode = HttpStatusCode.BadRequest;
                     _apiResponse.IsSuccess = false;
+                    _apiResponse.ErrorMessages.Add("Invalid Villa Number.");
                     return BadRequest(_apiResponse);
                 }
 
@@ -207,6 +216,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                 await _villaNumberRepository.UpdateAsync(villaNumber);
 
                 _apiResponse.StatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = _mapper.Map<VillaNumberDto>(villaNumber);
                 _apiResponse.IsSuccess = true;
 
                 return Ok(_apiResponse);
